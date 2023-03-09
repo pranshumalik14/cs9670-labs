@@ -1,9 +1,10 @@
 import numpy as np
 
+
 class MDP:
     '''A simple MDP class.  It includes the following members'''
 
-    def __init__(self,T,R,discount):
+    def __init__(self, T, R, discount):
         '''Constructor for the MDP class
 
         Inputs:
@@ -17,16 +18,19 @@ class MDP:
         assert T.ndim == 3, "Invalid transition function: it should have 3 dimensions"
         self.nActions = T.shape[0]
         self.nStates = T.shape[1]
-        assert T.shape == (self.nActions,self.nStates,self.nStates), "Invalid transition function: it has dimensionality " + repr(T.shape) + ", but it should be (nActions,nStates,nStates)"
-        assert (abs(T.sum(2)-1) < 1e-5).all(), "Invalid transition function: some transition probability does not equal 1"
+        assert T.shape == (self.nActions, self.nStates, self.nStates), "Invalid transition function: it has dimensionality " + \
+            repr(T.shape) + ", but it should be (nActions,nStates,nStates)"
+        assert (abs(T.sum(2)-1) < 1e-5).all(
+        ), "Invalid transition function: some transition probability does not equal 1"
         self.T = T
-        assert R.ndim == 2, "Invalid reward function: it should have 2 dimensions" 
-        assert R.shape == (self.nActions,self.nStates), "Invalid reward function: it has dimensionality " + repr(R.shape) + ", but it should be (nActions,nStates)"
+        assert R.ndim == 2, "Invalid reward function: it should have 2 dimensions"
+        assert R.shape == (self.nActions, self.nStates), "Invalid reward function: it has dimensionality " + \
+            repr(R.shape) + ", but it should be (nActions,nStates)"
         self.R = R
         assert 0 <= discount < 1, "Invalid discount factor: it should be in [0,1)"
         self.discount = discount
-        
-    def valueIteration(self,initialV,nIterations=np.inf,tolerance=0.01):
+
+    def valueIteration(self, initialV, nIterations=np.inf, tolerance=0.01):
         '''Value iteration procedure
         V <-- max_a R^a + gamma T^a V
 
@@ -39,16 +43,16 @@ class MDP:
         V -- Value function: array of |S| entries
         iterId -- # of iterations performed: scalar
         epsilon -- ||V^n-V^n+1||_inf: scalar'''
-        
+
         # temporary values to ensure that the code compiles until this
         # function is coded
         V = np.zeros(self.nStates)
         iterId = 0
         epsilon = 0
-        
-        return [V,iterId,epsilon]
 
-    def extractPolicy(self,V):
+        return [V, iterId, epsilon]
+
+    def extractPolicy(self, V):
         '''Procedure to extract a policy from a value function
         pi <-- argmax_a R^a + gamma T^a V
 
@@ -62,9 +66,9 @@ class MDP:
         # function is coded
         policy = np.zeros(self.nStates)
 
-        return policy 
+        return policy
 
-    def evaluatePolicy(self,policy):
+    def evaluatePolicy(self, policy):
         '''Evaluate a policy by solving a system of linear equations
         V^pi = R^pi + gamma T^pi V^pi
 
@@ -79,8 +83,8 @@ class MDP:
         V = np.zeros(self.nStates)
 
         return V
-        
-    def policyIteration(self,initialPolicy,nIterations=np.inf):
+
+    def policyIteration(self, initialPolicy, nIterations=np.inf):
         '''Policy iteration procedure: alternate between policy
         evaluation (solve V^pi = R^pi + gamma T^pi V^pi) and policy
         improvement (pi <-- argmax_a R^a + gamma T^a V^pi).
@@ -100,9 +104,9 @@ class MDP:
         V = np.zeros(self.nStates)
         iterId = 0
 
-        return [policy,V,iterId]
-            
-    def evaluatePolicyPartially(self,policy,initialV,nIterations=np.inf,tolerance=0.01):
+        return [policy, V, iterId]
+
+    def evaluatePolicyPartially(self, policy, initialV, nIterations=np.inf, tolerance=0.01):
         '''Partial policy evaluation:
         Repeat V^pi <-- R^pi + gamma T^pi V^pi
 
@@ -123,9 +127,9 @@ class MDP:
         iterId = 0
         epsilon = 0
 
-        return [V,iterId,epsilon]
+        return [V, iterId, epsilon]
 
-    def modifiedPolicyIteration(self,initialPolicy,initialV,nEvalIterations=5,nIterations=np.inf,tolerance=0.01):
+    def modifiedPolicyIteration(self, initialPolicy, initialV, nEvalIterations=5, nIterations=np.inf, tolerance=0.01):
         '''Modified policy iteration procedure: alternate between
         partial policy evaluation (repeat a few times V^pi <-- R^pi + gamma T^pi V^pi)
         and policy improvement (pi <-- argmax_a R^a + gamma T^a V^pi)
@@ -150,5 +154,4 @@ class MDP:
         iterId = 0
         epsilon = 0
 
-        return [policy,V,iterId,epsilon]
-        
+        return [policy, V, iterId, epsilon]
