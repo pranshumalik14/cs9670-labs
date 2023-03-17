@@ -44,11 +44,15 @@ class MDP:
         iterId -- # of iterations performed: scalar
         epsilon -- ||V^n-V^n+1||_inf: scalar'''
 
-        # temporary values to ensure that the code compiles until this
-        # function is coded
-        V = np.zeros(self.nStates)
+        V = initialV
         iterId = 0
-        epsilon = 0
+        epsilon = np.inf
+
+        while iterId < nIterations and epsilon > tolerance:
+            iterId += 1
+            V_opt = np.max(self.R + self.discount*(self.T @ V), axis=0)
+            epsilon = np.linalg.norm(V_opt - V, np.inf)  # inf-norm
+            V = V_opt
 
         return [V, iterId, epsilon]
 
@@ -62,9 +66,7 @@ class MDP:
         Output:
         policy -- Policy: array of |S| entries'''
 
-        # temporary values to ensure that the code compiles until this
-        # function is coded
-        policy = np.zeros(self.nStates)
+        policy = np.argmax(self.R + self.discount*(self.T @ V), axis=0)
 
         return policy
 
@@ -76,13 +78,14 @@ class MDP:
         policy -- Policy: array of |S| entries
 
         Ouput:
-        V -- Value function: array of |S| entries'''
+        V_pi -- Value function: array of |S| entries'''
 
-        # temporary values to ensure that the code compiles until this
-        # function is coded
-        V = np.zeros(self.nStates)
+        R_pi = np.array([self.R[policy[i]][i] for i in range(self.nStates)])
+        T_pi = np.array([self.T[policy[i]][i] for i in range(self.nStates)])
 
-        return V
+        return np.linalg.solve(
+            np.identity(self.nStates) - self.discount*T_pi, R_pi
+        )
 
     def policyIteration(self, initialPolicy, nIterations=np.inf):
         '''Policy iteration procedure: alternate between policy
@@ -98,11 +101,18 @@ class MDP:
         V -- Value function: array of |S| entries
         iterId -- # of iterations peformed by modified policy iteration: scalar'''
 
-        # temporary values to ensure that the code compiles until this
-        # function is coded
-        policy = np.zeros(self.nStates)
+        policy = initialPolicy
+        policy_opt = np.zeros(self.nStates)
         V = np.zeros(self.nStates)
         iterId = 0
+
+        while iterId < nIterations:
+            iterId += 1
+            V = self.evaluatePolicy(policy)
+            policy_opt = self.extractPolicy(V)
+            if np.array_equal(policy, policy_opt):
+                break
+            policy = policy_opt
 
         return [policy, V, iterId]
 
@@ -121,11 +131,18 @@ class MDP:
         iterId -- # of iterations performed: scalar
         epsilon -- ||V^n-V^n+1||_inf: scalar'''
 
-        # temporary values to ensure that the code compiles until this
-        # function is coded
-        V = np.zeros(self.nStates)
+        V = initialV
         iterId = 0
-        epsilon = 0
+        epsilon = np.inf
+
+        R_pi = np.array([self.R[policy[i]][i] for i in range(self.nStates)])
+        T_pi = np.array([self.T[policy[i]][i] for i in range(self.nStates)])
+
+        while iterId < nIterations and epsilon > tolerance:
+            iterId += 1
+            V_est = R_pi + self.discount*(T_pi @ V)
+            epsilon = np.linalg.norm(V_est - V, np.inf)
+            V = V_est
 
         return [V, iterId, epsilon]
 
@@ -147,11 +164,19 @@ class MDP:
         iterId -- # of iterations peformed by modified policy iteration: scalar
         epsilon -- ||V^n-V^n+1||_inf: scalar'''
 
-        # temporary values to ensure that the code compiles until this
-        # function is coded
-        policy = np.zeros(self.nStates)
-        V = np.zeros(self.nStates)
+        policy = initialPolicy
+        policy_opt = np.zeros(self.nStates)
+        V = initialV
         iterId = 0
-        epsilon = 0
+        epsilon = np.inf
+
+        while iterId < nIterations and epsilon > tolerance:
+            iterId += 1
+            V_opt, _, _ = self.evaluatePolicyPartially(
+                policy, V, nIterations=nEvalIterations)
+            policy_opt = self.extractPolicy(V_opt)
+            epsilon = np.linalg.norm(V_opt - V, np.inf)
+            V = V_opt
+            policy = policy_opt
 
         return [policy, V, iterId, epsilon]

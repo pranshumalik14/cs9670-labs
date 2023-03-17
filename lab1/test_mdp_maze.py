@@ -1,3 +1,5 @@
+# %%
+import matplotlib.pyplot as plt
 import numpy as np
 import mdp
 
@@ -301,7 +303,20 @@ mdp = mdp.MDP(T, R, discount)
 '''Test each procedure'''
 [V, nIterations, epsilon] = mdp.valueIteration(
     initialV=np.zeros(mdp.nStates), tolerance=0.01)
+policy = mdp.extractPolicy(V)
 [policy, V, nIterations] = mdp.policyIteration(
     np.zeros(mdp.nStates, dtype=int))
-[policy, V, nIterations, epsilon] = mdp.modifiedPolicyIteration(
-    np.zeros(mdp.nStates, dtype=int), np.zeros(mdp.nStates), tolerance=0.01)
+nIterations = np.zeros(10)
+for i in range(10):
+    [policy, V, nIterations[i], epsilon] = mdp.modifiedPolicyIteration(
+        np.zeros(mdp.nStates, dtype=int), np.zeros(mdp.nStates), tolerance=0.01, nEvalIterations=i)
+
+# %%
+plt.rcParams['figure.dpi'] = 600
+plt.plot(range(10), nIterations)
+plt.xlabel("policy-eval iters")
+plt.ylabel("policy-opt iters")
+plt.title("Modified Policy Iteration Convergence Iterations")
+plt.show()
+
+# %%
