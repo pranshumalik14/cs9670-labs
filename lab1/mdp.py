@@ -165,7 +165,6 @@ class MDP:
         epsilon -- ||V^n-V^n+1||_inf: scalar'''
 
         policy = initialPolicy
-        policy_opt = np.zeros(self.nStates)
         V = initialV
         iterId = 0
         epsilon = np.inf

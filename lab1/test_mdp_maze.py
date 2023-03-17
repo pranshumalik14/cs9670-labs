@@ -307,8 +307,8 @@ policy = mdp.extractPolicy(V)
 [policy, V, nIterations] = mdp.policyIteration(
     np.zeros(mdp.nStates, dtype=int))
 nIterations = np.zeros(10)
-for i in range(10):
-    [policy, V, nIterations[i], epsilon] = mdp.modifiedPolicyIteration(
+for i in range(1,11):
+    [policy, V, nIterations[i-1], epsilon] = mdp.modifiedPolicyIteration(
         np.zeros(mdp.nStates, dtype=int), np.zeros(mdp.nStates), tolerance=0.01, nEvalIterations=i)
 
 # %%
@@ -317,6 +317,7 @@ plt.plot(range(10), nIterations)
 plt.xlabel("policy-eval iters")
 plt.ylabel("policy-opt iters")
 plt.title("Modified Policy Iteration Convergence Iterations")
+plt.tight_layout()
 plt.show()
 
 # %%
