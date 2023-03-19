@@ -35,7 +35,7 @@ class RL:
         nextState = np.where(cumProb >= np.random.rand(1))[0][0]
         return [reward, nextState]
 
-    def qLearning(self, s0, initialQ, nEpisodes, nSteps, nTrials=10, epsilon=0, temperature=0):
+    def qLearning(self, s0, initialQ, nEpisodes, nSteps, nTrials=100, epsilon=0, temperature=0):
         '''qLearning algorithm.  Epsilon exploration and Boltzmann exploration
         are combined in one procedure by sampling a random action with 
         probability epsilon and performing Boltzmann exploration otherwise.  
@@ -60,7 +60,7 @@ class RL:
         cum_rewards = np.zeros(nEpisodes)
 
         for _ in range(nTrials):
-            Q = initialQ  # all trials start with same initial Q estimate
+            Q = initialQ.copy()  # all trials start with same initial Q estimate
             counts = np.zeros([self.mdp.nActions, self.mdp.nStates])
             rewards = np.zeros(nEpisodes)  # rewards collection for curr trial
             for epi in range(nEpisodes):   # repeat rollouts to improve Q estimates
